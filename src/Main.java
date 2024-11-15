@@ -1,7 +1,6 @@
-import java.awt.*;
-
-public class Main {
+ public class Main {
     public static void main(String[] args) {
+        // For later functionality :)
         for (String arg : args) {
             switch (arg) {
                 case "-a":
@@ -15,7 +14,8 @@ public class Main {
                     break;
             }
         }
-        //MainWindow window = new MainWindow();
+
+        // Here's where the magic happens
         new MainWindow();
 
     }
