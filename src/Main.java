@@ -15,7 +15,8 @@ public class Main {
                     break;
             }
         }
-        AWTExample f = new AWTExample();
+        //MainWindow window = new MainWindow();
+        new MainWindow();
 
     }
 }
