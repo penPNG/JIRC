@@ -25,7 +25,7 @@ public class MainWindow extends JFrame {
         chatPanel = new ChatPanel();
         mc.insets = new Insets(0,0,0,5);mc.gridx = 0; mc.weighty = 1; mc.weightx = 0; mc.fill = GridBagConstraints.BOTH;
         mainPanel.add(serverPanel,mc);
-        mc.weighty = 1; mc.weightx = 1; mc.gridx = 1;
+        mc.weighty = 1; mc.weightx = 1; mc.gridx = 1; mc.insets = new Insets(0,0,0,0);
         mainPanel.add(chatPanel, mc);
 
         // Make a border, so pretty!

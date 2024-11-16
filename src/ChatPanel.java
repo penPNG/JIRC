@@ -24,7 +24,7 @@ public class ChatPanel extends JPanel {
         chat = new JTextArea();
         chat.setLineWrap(true);
         chat.setWrapStyleWord(true);
-        chat.setEditable(true);
+        chat.setEditable(false);
         chat.setFont(new Font("Consolas", Font.PLAIN, 14));
         chat.setBackground(new Color(0x201d1e));
         chat.setForeground(new Color(0xe97263));
