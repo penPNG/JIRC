@@ -9,11 +9,11 @@ public class ServerPanel extends JPanel {
         GridBagConstraints serverListContstraints = new GridBagConstraints();
 
         // Create an empty list then add stuff to it :)
-        DefaultListModel<String> blankList = new DefaultListModel<>();
-        serverList = new JList<>(blankList);
-        blankList.addElement("Server");
-        blankList.addElement("├ #Channel");
-        blankList.addElement("└ #Other");
+        DefaultListModel<String> serverListModel  = new DefaultListModel<>();
+        serverList = new JList<>(serverListModel);
+        serverListModel.addElement("Server");
+        serverListModel.addElement("├ #Channel");
+        serverListModel.addElement("└ #Other");
 
         // Make it pretty
         serverList.setVisible(true);
@@ -23,10 +23,12 @@ public class ServerPanel extends JPanel {
         serverList.setFont(new Font("Consolas", Font.PLAIN, 14));
         serverList.setSelectionForeground(new Color(0x201d1e));
         serverList.setSelectionBackground(new Color(0xf18c7e));
+        serverList.setBorder(null);
 
         // Put it in the panel
         serverListContstraints.weightx = 1; serverListContstraints.weighty = 1;
         serverListContstraints.fill = GridBagConstraints.BOTH;
+        serverListContstraints.ipadx = 50;
         add(serverList, serverListContstraints);
         setBackground(Color.GRAY); // Should never see this color, would be a bug
         setVisible(true);
