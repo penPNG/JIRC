@@ -1,5 +1,6 @@
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.PrintWriter;
 import javax.swing.*;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
@@ -12,6 +13,7 @@ public class ChatPanel extends JPanel {
     JTextField message;
     JList<String> userList;
     Action sendMessage;
+    PrintWriter sender;
 
     // public ChatPanel(int x, int y) {}
 
@@ -52,7 +54,11 @@ public class ChatPanel extends JPanel {
         sendMessage = new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                updateChat();
+                if (!message.getText().startsWith("\\")) {
+                    updateChat(message.getText());
+                    sender.println("PRIVMSG #test :" + message.getText());
+                }
+                message.setText("");
             }
         };
         message.addActionListener(sendMessage);
@@ -79,8 +85,12 @@ public class ChatPanel extends JPanel {
         setBackground(Color.CYAN); // if this color is seen, something has gone wrong
     }
 
-    public void updateChat() {
-        chat.append(message.getText()+'\n');
-        message.setText("");
+    public void updateChat(String message) {
+        chat.append(message+'\n');
+        chat.setCaretPosition(chat.getDocument().getLength());
+    }
+
+    public void setSender(PrintWriter sender) {
+        this.sender = sender;
     }
 }

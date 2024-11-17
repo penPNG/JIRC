@@ -17,6 +17,5 @@
 
         // Here's where the magic happens
         new MainWindow();
-
     }
 }

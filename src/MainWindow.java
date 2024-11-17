@@ -2,12 +2,20 @@ import java.awt.*;
 import javax.swing.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.*;
+import java.net.Socket;
 
 public class MainWindow extends JFrame {
     ServerPanel serverPanel;
     ChatPanel chatPanel;
+    Socket server;
+    PrintWriter sender;
+    BufferedReader receiver;
+    boolean quit;
 
     public MainWindow() {
+        quit = false;
+
         // Set color and constraints and layout
         getContentPane().setBackground(new Color(0x2C282A));
         GridBagConstraints wc = new GridBagConstraints();
@@ -44,9 +52,93 @@ public class MainWindow extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
+                quit = true;
+                discconnectServer();
                 dispose();
                 System.exit(0);
             }
         });
+
+        mainLoop();
+    }
+
+    public void dispose() {
+        super.dispose();
+        try {
+            receiver.close();
+            server.close();
+            sender.close();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void mainLoop() {
+        connectToServer();
+        while (!quit) {
+            try {
+                // chatPanel.updateChat(receiver.readLine());
+                handleChat(receiver.readLine());
+
+            } catch (IOException e) {
+                System.out.println("Connection Lost");
+            }
+        }
+    }
+
+    public void connectToServer() {
+        String hostname = "irc.libera.chat";
+        try {
+            server = new Socket(hostname, 6667);
+            sender =
+                    new PrintWriter(server.getOutputStream(),true);
+            receiver =
+                    new BufferedReader(
+                            new InputStreamReader(server.getInputStream()));
+            sender.println("NICK penTest");
+            sender.println("USER pen * * :penpng");
+            sender.println("JOIN #test");
+        } catch (IOException e) {
+            System.out.println("Connection Lost");
+        }
+        chatPanel.setSender(sender);
+    }
+
+    public void discconnectServer() {
+        sender.println("PART #test :Closed Client");
+        sender.println("QUIT :Closed client");
+    }
+
+    public void handleChat(String fullMessage) {
+        String[] messageSplit = fullMessage.split(" :");
+        String command, message;
+        if (messageSplit.length > 1) {
+            command = messageSplit[0];
+            message = messageSplit[1];
+        } else {
+            messageSplit = fullMessage.split(":(.*?) ");
+            command = messageSplit[0];
+            message = messageSplit[1];
+        }
+        if (command.matches("[0-9]{3} pentest")) {
+            switch (Integer.parseInt(command.split("[0-9]{3}")[0])) {
+                case 372: chatPanel.updateChat(message);
+                            break;
+                case 375: chatPanel.updateChat(message);
+                            break;
+                case 376: chatPanel.updateChat(message);
+                            break;
+                default: break;
+
+            }
+        }
+        if (command.contains("PRIVMSG")) {
+            chatPanel.updateChat(command.split("!")[0].substring(1)+": "+message);
+            return;
+        }
+        if (command.contains("MODE")) return;
+        if (message.contains("JOIN")) return;
+        if (command.contains("PING"))  { sender.println("PONG "+command.split(" ")[0].substring(1)); return; }
+        chatPanel.updateChat(message);
     }
 }
