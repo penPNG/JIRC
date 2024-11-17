@@ -4,6 +4,8 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.*;
 import java.net.Socket;
+import java.util.Arrays;
+import java.util.List;
 
 public class MainWindow extends JFrame {
     ServerPanel serverPanel;
@@ -12,6 +14,13 @@ public class MainWindow extends JFrame {
     PrintWriter sender;
     BufferedReader receiver;
     boolean quit;
+    String[] users;
+    List<String> COMMANDS = Arrays.asList(
+            "PRIVMSG",
+            "PING",
+            "NOTICE",
+            "JOIN",
+            "MODE");
 
     public MainWindow() {
         quit = false;
@@ -77,8 +86,7 @@ public class MainWindow extends JFrame {
         connectToServer();
         while (!quit) {
             try {
-                // chatPanel.updateChat(receiver.readLine());
-                handleChat(receiver.readLine());
+                parseChat(receiver.readLine());
 
             } catch (IOException e) {
                 System.out.println("Connection Lost");
@@ -109,36 +117,45 @@ public class MainWindow extends JFrame {
         sender.println("QUIT :Closed client");
     }
 
-    public void handleChat(String fullMessage) {
+    public void parseChat(String fullMessage) {
         String[] messageSplit = fullMessage.split(" :");
         String command, message;
         if (messageSplit.length > 1) {
-            command = messageSplit[0];
+            command = messageSplit[0].split(" ")[1];
             message = messageSplit[1];
         } else {
-            messageSplit = fullMessage.split(":(.*?) ");
-            command = messageSplit[0];
-            message = messageSplit[1];
+            messageSplit = fullMessage.split(" ");
+            command = messageSplit[1];
+            message = messageSplit[2];
         }
-        if (command.matches("[0-9]{3} pentest")) {
-            switch (Integer.parseInt(command.split("[0-9]{3}")[0])) {
-                case 372: chatPanel.updateChat(message);
-                            break;
-                case 375: chatPanel.updateChat(message);
-                            break;
-                case 376: chatPanel.updateChat(message);
-                            break;
-                default: break;
 
+        for (String cmd: COMMANDS) {
+            if (command.contains(cmd)) {
+                switch (COMMANDS.indexOf(cmd)) {
+                    case 0:
+                        chatPanel.updateChat(messageSplit[0].split("!")[0].substring(1)+": "+message);
+                        return;
+                    case 1:
+                        sender.println("PONG "+command.split(" ")[0].substring(1));
+                        return;
+                    case 2, 3, 4:
+                        return;
+                }
             }
         }
-        if (command.contains("PRIVMSG")) {
-            chatPanel.updateChat(command.split("!")[0].substring(1)+": "+message);
-            return;
+        switch (Integer.parseInt(command)) {
+            case 353:
+                users = message.split(" ");
+                chatPanel.setUserList(users);
+                return;
+            case 372, 375, 376:
+                chatPanel.updateChat(message);
+                return;
+            case 366:
+                return;
+            default:
+                break;
         }
-        if (command.contains("MODE")) return;
-        if (message.contains("JOIN")) return;
-        if (command.contains("PING"))  { sender.println("PONG "+command.split(" ")[0].substring(1)); return; }
         chatPanel.updateChat(message);
     }
 }

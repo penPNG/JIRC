@@ -28,7 +28,7 @@ public class ServerPanel extends JPanel {
         // Put it in the panel
         serverListContstraints.weightx = 1; serverListContstraints.weighty = 1;
         serverListContstraints.fill = GridBagConstraints.BOTH;
-        serverListContstraints.ipadx = 50;
+        serverListContstraints.ipadx = 45;
         add(serverList, serverListContstraints);
         setBackground(Color.GRAY); // Should never see this color, would be a bug
         setVisible(true);
